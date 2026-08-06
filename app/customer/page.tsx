@@ -16,11 +16,13 @@ export default function CustomerDashboardPage() {
     setLoading(true);
     try {
       const supabase = getSupabase();
-      if (!supabase) return;
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      let token: string | undefined = undefined;
+      if (supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        token = session?.access_token;
+      }
 
-      const res = await getCustomerBookings(session.access_token);
+      const res = await getCustomerBookings(token);
       if (res.success && res.data) {
         setBookings(res.data);
       }

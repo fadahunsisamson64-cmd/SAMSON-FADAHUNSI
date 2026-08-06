@@ -8,7 +8,7 @@ export async function getBusinessForBooking(slug: string) {
     const business = await prisma.business.findFirst({
       where: {
         OR: [
-          { slug: { equals: slug, mode: 'insensitive' } },
+          { slug: slug },
           { id: slug }
         ]
       },

@@ -6,15 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-}
-
-enum UserRole {
-  CUSTOMER
-  BUSINESS_OWNER
-  STAFF
-  ADMIN
 }
 
 model User {
@@ -22,7 +15,7 @@ model User {
   email     String   @unique
   name      String?
   avatarUrl String?
-  role      UserRole @default(CUSTOMER)
+  role      String   @default("CUSTOMER")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -94,33 +87,19 @@ model Service {
   bookings Booking[]
 }
 
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-  COMPLETED
-}
-
-enum PaymentStatus {
-  PENDING
-  DEPOSIT_PAID
-  PAID
-  REFUNDED
-}
-
 model Booking {
-  id            String        @id @default(cuid())
+  id            String   @id @default(cuid())
   customerId    String
   businessId    String
   serviceId     String
   staffId       String?
   startTime     DateTime
   endTime       DateTime
-  status        BookingStatus @default(PENDING)
-  paymentStatus PaymentStatus @default(PENDING)
+  status        String   @default("PENDING")
+  paymentStatus String   @default("PENDING")
   totalPrice    Float
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   customer User     @relation(fields: [customerId], references: [id])
   business Business @relation(fields: [businessId], references: [id])

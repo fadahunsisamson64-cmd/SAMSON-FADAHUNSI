@@ -12,9 +12,9 @@ export default async function ExplorePage(props: { searchParams?: Promise<{ [key
   const businesses = await prisma.business.findMany({
     where: q ? {
       OR: [
-        { name: { contains: q, mode: 'insensitive' } },
-        { description: { contains: q, mode: 'insensitive' } },
-        { services: { some: { name: { contains: q, mode: 'insensitive' } } } }
+        { name: { contains: q } },
+        { description: { contains: q } },
+        { services: { some: { name: { contains: q } } } }
       ]
     } : undefined,
     include: {
