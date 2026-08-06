@@ -35,6 +35,25 @@ export async function createBooking(data: {
   price: number;
 }) {
   try {
+// Check for conflicting bookings if a staff member is selected
+    if (data.staffId) {
+      const conflictingBooking = await prisma.booking.findFirst({
+        where: {
+          staffId: data.staffId,
+          status: { notIn: ['CANCELLED'] },
+          OR: [
+            { startTime: { lt: data.endTime, gte: data.startTime } },
+            { endTime: { gt: data.startTime, lte: data.endTime } },
+            { startTime: { lte: data.startTime }, endTime: { gte: data.endTime } }
+          ]
+        }
+      });
+      
+      if (conflictingBooking) {
+        return { success: false, error: 'The selected time slot is no longer available for this staff member.' };
+      }
+    }
+    
     // Upsert customer based on email
     let user = await prisma.user.findUnique({ where: { email: data.customerEmail } });
     if (!user) {

@@ -6,10 +6,17 @@ import { getSupabase } from '@/lib/supabase';
 import { LayoutDashboard, Calendar, Users, Settings, LogOut, Loader2, Sparkles, Bell, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import DashboardNavbar from '@/components/DashboardNavbar';
+import { getBusinessProfile, updateBusinessProfile } from '@/app/actions/settings';
 
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+
+  const [businessName, setBusinessName] = useState('');
+  const [description, setDescription] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+
   const router = useRouter();
 
   useEffect(() => {
@@ -27,7 +34,15 @@ export default function SettingsPage() {
           return;
         }
         
+        
         setUser(session.user);
+        
+        const profileRes = await getBusinessProfile(session.access_token);
+        if (profileRes.success && profileRes.data) {
+          setBusinessName(profileRes.data.name || '');
+          setDescription(profileRes.data.description || '');
+        }
+
       } catch (err) {
         console.error(err);
       } finally {
@@ -37,6 +52,33 @@ export default function SettingsPage() {
     
     checkUser();
   }, [router]);
+
+  
+  const handleSave = async () => {
+    setIsSaving(true);
+    setMessage({ type: '', text: '' });
+    try {
+      const supabase = getSupabase();
+      if (!supabase) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      
+      const res = await updateBusinessProfile(session.access_token, {
+        name: businessName,
+        description
+      });
+      
+      if (res.success) {
+        setMessage({ type: 'success', text: 'Profile updated successfully.' });
+      } else {
+        setMessage({ type: 'error', text: res.error || 'Failed to update.' });
+      }
+    } catch (e) {
+      setMessage({ type: 'error', text: 'An unexpected error occurred.' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleLogout = async () => {
     const supabase = getSupabase();
@@ -116,7 +158,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="text-sm font-medium text-brand-dark block mb-2">Business Name</label>
-                    <input type="text" className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary" placeholder="e.g. Glow Spa" />
+                    <input type="text" value={businessName} onChange={(e) => setBusinessName(e.target.value)} className="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary" placeholder="e.g. Glow Spa" />
                   </div>
                   <div>
                     <label className="text-sm font-medium text-brand-dark block mb-2">Email Address</label>
@@ -126,9 +168,21 @@ export default function SettingsPage() {
               </div>
 
               <div className="pt-6 border-t border-gray-100">
-                <button className="bg-brand-primary hover:bg-brand-secondary text-white px-6 py-2.5 rounded-xl font-medium transition-colors">
+                
+                {message.text && (
+                  <div className={`mb-4 p-3 rounded-xl text-sm font-medium ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
+                    {message.text}
+                  </div>
+                )}
+                <button 
+                  onClick={handleSave} 
+                  disabled={isSaving}
+                  className="bg-brand-primary hover:bg-brand-secondary disabled:opacity-70 text-white px-6 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2"
+                >
+                  {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                   Save Changes
                 </button>
+
               </div>
             </div>
           </div>

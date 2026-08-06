@@ -1,9 +1,12 @@
 'use server'
+import { verifyAdmin } from '@/lib/auth-server';
 
 import { prisma } from '@/lib/prisma'
 
-export async function getAdminDashboardData() {
+export async function getAdminDashboardData(token: string) {
   try {
+    const admin = await verifyAdmin(token);
+    if (!admin) return { success: false, error: 'Unauthorized' };
     const totalBusinesses = await prisma.business.count();
     const activeUsers = await prisma.user.count();
     
@@ -44,8 +47,10 @@ export async function getAdminDashboardData() {
   }
 }
 
-export async function getAdminBusinesses() {
+export async function getAdminBusinesses(token: string) {
   try {
+    const admin = await verifyAdmin(token);
+    if (!admin) return { success: false, error: 'Unauthorized' };
     const businesses = await prisma.business.findMany({
       include: {
         owner: true,
@@ -74,8 +79,10 @@ export async function getAdminBusinesses() {
   }
 }
 
-export async function getAdminUsers() {
+export async function getAdminUsers(token: string) {
   try {
+    const admin = await verifyAdmin(token);
+    if (!admin) return { success: false, error: 'Unauthorized' };
     const users = await prisma.user.findMany({
       orderBy: { createdAt: 'desc' }
     });

@@ -33,7 +33,7 @@ export default function CalendarPage() {
         
         setUser(session.user);
 
-        const res = await getCalendarBookings(session.user.id);
+        const res = await getCalendarBookings(session.access_token);
         if (res.success && res.data) {
           setBookings(res.data);
         }

@@ -2,8 +2,13 @@
 
 import { prisma } from '@/lib/prisma'
 
-export async function getCustomers(userId: string) {
+import { verifyServerToken } from '@/lib/auth-server';
+
+export async function getCustomers(token: string) {
   try {
+    const user = await verifyServerToken(token);
+    if (!user) return { success: false, error: 'Unauthorized' };
+    const userId = user.id;
     const business = await prisma.business.findFirst({
       where: { ownerId: userId },
       include: {

@@ -13,6 +13,7 @@ export default function CustomersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [customers, setCustomers] = useState<any[]>([]);
+  const [search, setSearch] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function CustomersPage() {
         
         setUser(session.user);
 
-        const res = await getCustomers(session.user.id);
+        const res = await getCustomers(session.access_token);
         if (res.success && res.data) {
           setCustomers(res.data);
         }
@@ -122,8 +123,10 @@ export default function CustomersPage() {
               <div className="flex gap-3">
                 <div className="relative">
                   <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted" />
-                  <input 
+                                    <input 
                     type="text" 
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search customers..." 
                     className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary w-full sm:w-64"
                   />
@@ -159,7 +162,7 @@ export default function CustomersPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 text-sm">
-                    {customers.map((c) => (
+                                        {customers.filter(c => c.name?.toLowerCase().includes(search.toLowerCase()) || c.email?.toLowerCase().includes(search.toLowerCase())).map((c) => (
                       <tr key={c.id} className="hover:bg-gray-50/50 transition-colors">
                         <td className="p-4 pl-6 font-medium text-brand-dark">{c.name || 'Unknown'}</td>
                         <td className="p-4 text-brand-muted">{c.email}</td>

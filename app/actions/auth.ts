@@ -1,23 +1,25 @@
 'use server'
+import { verifyServerToken } from '@/lib/auth-server';
 
 import { prisma } from '@/lib/prisma'
 
-export async function syncUserAction(supabaseUser: { id: string, email: string, user_metadata: any }) {
+export async function syncUserAction(token: string) {
   try {
+    const supabaseUser = await verifyServerToken(token);
+    if (!supabaseUser || !supabaseUser.email) return { success: false, error: 'Unauthorized' };
+    
     const user = await prisma.user.upsert({
       where: { email: supabaseUser.email },
       update: {
         name: supabaseUser.user_metadata?.full_name || supabaseUser.email.split('@')[0],
       },
       create: {
-        id: supabaseUser.id, // Using the same ID as Supabase auth
+        id: supabaseUser.id,
         email: supabaseUser.email,
         name: supabaseUser.user_metadata?.full_name || supabaseUser.email.split('@')[0],
         role: 'BUSINESS_OWNER',
       }
-    });
-
-    // Ensure business exists
+    });// Ensure business exists
     const existingBusiness = await prisma.business.findFirst({
       where: { ownerId: user.id }
     });

@@ -28,14 +28,14 @@ export default function AdminNavbar({ user, onLogout }: AdminNavbarProps) {
   const pathname = usePathname();
 
   const navigation = [
-    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    { name: 'Dashboard', href: '/super-admin', icon: LayoutDashboard },
     { name: 'Businesses', href: '/admin/businesses', icon: Store },
     { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 
   const getPageTitle = () => {
-    if (pathname === '/admin') return 'Admin Dashboard';
+    if (pathname === '/super-admin') return 'Admin Dashboard';
     if (pathname === '/admin/businesses') return 'Businesses';
     if (pathname === '/admin/users') return 'Users';
     if (pathname === '/admin/settings') return 'Settings';

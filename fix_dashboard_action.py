@@ -1,14 +1,12 @@
-'use server'
+import re
 
-import { prisma } from '@/lib/prisma'
-import { verifyServerToken } from '@/lib/auth-server';
+with open("app/actions/dashboard.ts", "r") as f:
+    content = f.read()
 
-export async function getDashboardData(token: string) {
-  try {
-    const user = await verifyServerToken(token);
-    if (!user) return { success: false, error: 'Unauthorized' };
-    const userId = user.id;
+# We should fetch all bookings, or just use separate queries.
+# Since it's server action, it's fine.
 
+replacement = """
     const business = await prisma.business.findFirst({
       where: { ownerId: userId }
     });
@@ -54,8 +52,14 @@ export async function getDashboardData(token: string) {
         }))
       } 
     };
-  } catch (error) {
-    console.error('Error fetching dashboard data:', error);
-    return { success: false, error: 'Failed to fetch dashboard data' };
-  }
-}
+"""
+
+content = re.sub(
+    r"const business = await prisma\.business\.findFirst\(\{.*?return\s*\{.*?\}\s*\};\s*\} catch \(error\)",
+    replacement.strip() + "\n  } catch (error)",
+    content,
+    flags=re.DOTALL
+)
+
+with open("app/actions/dashboard.ts", "w") as f:
+    f.write(content)

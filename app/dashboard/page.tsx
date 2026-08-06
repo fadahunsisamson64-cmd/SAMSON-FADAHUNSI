@@ -33,15 +33,11 @@ export default function DashboardPage() {
 
         // Sync user in background (or wait)
         const { syncUserAction } = await import('@/app/actions/auth');
-        const syncResult = await syncUserAction({
-          id: session.user.id,
-          email: session.user.email || '',
-          user_metadata: session.user.user_metadata
-        });
+        const syncResult = await syncUserAction(session.access_token);
 
         // Fetch real data
         const { getDashboardData } = await import('@/app/actions/dashboard');
-        const dbData = await getDashboardData(session.user.id);
+        const dbData = await getDashboardData(session.access_token);
         
         if (dbData.success && dbData.data) {
            setDashboardData(dbData.data);

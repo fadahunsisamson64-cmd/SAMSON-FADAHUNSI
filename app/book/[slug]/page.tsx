@@ -22,6 +22,7 @@ export default function BookingPage() {
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [customerDetails, setCustomerDetails] = useState({ name: '', email: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -65,6 +66,7 @@ export default function BookingPage() {
   const confirmBooking = async () => {
     if (!selectedService || !selectedDate || !selectedTime || !customerDetails.name || !customerDetails.email) return;
     setSubmitting(true);
+    setBookingError(null);
     
     // Simple mock time parsing for demo
     const [time, period] = selectedTime.split(' ');
@@ -92,7 +94,7 @@ export default function BookingPage() {
     if (res.success) {
       setStep(5); // Success step
     } else {
-      alert(res.error || 'Failed to book');
+      setBookingError(res.error || 'Failed to book');
     }
     setSubmitting(false);
   };
@@ -131,7 +133,9 @@ export default function BookingPage() {
                   ) : (
                     <div className="space-y-3">
                       {business.services.map((service: any) => (
-                        <button
+              
+          <button
+
                           key={service.id}
                           onClick={() => { setSelectedService(service); handleNext(); }}
                           className={`w-full flex items-center justify-between p-4 rounded-2xl border text-left transition-all ${selectedService?.id === service.id ? 'border-brand-primary bg-brand-primary/5 ring-1 ring-brand-primary' : 'border-gray-200 hover:border-brand-primary/30 hover:bg-gray-50'}`}
@@ -154,7 +158,9 @@ export default function BookingPage() {
               {step === 2 && (
                 <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                   <div className="flex items-center gap-3 mb-6">
-                    <button onClick={handleBack} className="p-2 -ml-2 rounded-lg text-brand-muted hover:bg-gray-50 transition-colors">
+          
+          <button
+ onClick={handleBack} className="p-2 -ml-2 rounded-lg text-brand-muted hover:bg-gray-50 transition-colors">
                       <ArrowLeft className="w-5 h-5" />
                     </button>
                     <h2 className="text-xl font-bold text-brand-dark">Select Date & Time</h2>
@@ -181,7 +187,9 @@ export default function BookingPage() {
                       <label className="text-sm font-semibold text-brand-dark mb-3 block">Available Times</label>
                       <div className="grid grid-cols-2 gap-2">
                         {timeSlots.map(time => (
-                          <button
+                
+          <button
+
                             key={time}
                             onClick={() => setSelectedTime(time)}
                             className={`py-3 px-4 rounded-xl border text-sm font-medium transition-all ${selectedTime === time ? 'border-brand-primary bg-brand-primary text-white shadow-md' : 'border-gray-200 text-brand-dark hover:border-brand-primary/30'}`}
@@ -194,7 +202,9 @@ export default function BookingPage() {
                   </div>
 
                   <div className="mt-8 pt-6 border-t border-gray-100 flex justify-end">
-                    <button
+          
+          <button
+
                       onClick={handleNext}
                       disabled={!selectedTime}
                       className="bg-brand-dark hover:bg-brand-primary text-white px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -209,7 +219,9 @@ export default function BookingPage() {
               {step === 3 && (
                 <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                   <div className="flex items-center gap-3 mb-6">
-                    <button onClick={handleBack} className="p-2 -ml-2 rounded-lg text-brand-muted hover:bg-gray-50 transition-colors">
+          
+          <button
+ onClick={handleBack} className="p-2 -ml-2 rounded-lg text-brand-muted hover:bg-gray-50 transition-colors">
                       <ArrowLeft className="w-5 h-5" />
                     </button>
                     <h2 className="text-xl font-bold text-brand-dark">Your Details</h2>
@@ -239,7 +251,9 @@ export default function BookingPage() {
                   </div>
 
                   <div className="mt-8 pt-6 border-t border-gray-100 flex justify-end">
-                    <button
+          
+          <button
+
                       onClick={handleNext}
                       disabled={!customerDetails.name || !customerDetails.email}
                       className="bg-brand-dark hover:bg-brand-primary text-white px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -254,7 +268,9 @@ export default function BookingPage() {
               {step === 4 && (
                 <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                   <div className="flex items-center gap-3 mb-6">
-                    <button onClick={handleBack} className="p-2 -ml-2 rounded-lg text-brand-muted hover:bg-gray-50 transition-colors">
+          
+          <button
+ onClick={handleBack} className="p-2 -ml-2 rounded-lg text-brand-muted hover:bg-gray-50 transition-colors">
                       <ArrowLeft className="w-5 h-5" />
                     </button>
                     <h2 className="text-xl font-bold text-brand-dark">Review & Confirm</h2>
@@ -284,7 +300,9 @@ export default function BookingPage() {
                   </div>
 
                   <div className="mt-4 flex justify-end">
-                    <button
+          
+          <button
+
                       onClick={confirmBooking}
                       disabled={submitting}
                       className="bg-brand-primary hover:bg-brand-secondary text-white w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0"
@@ -307,7 +325,9 @@ export default function BookingPage() {
                     Your appointment for <strong>{selectedService?.name}</strong> has been successfully booked for {selectedTime}. We&apos;ve sent a confirmation email to {customerDetails.email}.
                   </p>
                   
-                  <button onClick={() => window.location.reload()} className="text-brand-primary font-medium hover:text-brand-accent transition-colors">
+        
+          <button
+ onClick={() => window.location.reload()} className="text-brand-primary font-medium hover:text-brand-accent transition-colors">
                     Book another appointment
                   </button>
                 </motion.div>
