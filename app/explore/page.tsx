@@ -9,20 +9,25 @@ export default async function ExplorePage(props: { searchParams?: Promise<{ [key
   const searchParams = await props.searchParams;
   const q = typeof searchParams?.q === 'string' ? searchParams.q : undefined;
 
-  const businesses = await prisma.business.findMany({
-    where: q ? {
-      OR: [
-        { name: { contains: q } },
-        { description: { contains: q } },
-        { services: { some: { name: { contains: q } } } }
-      ]
-    } : undefined,
-    include: {
-      services: true,
-      bookings: { include: { review: true } }
-    },
-    orderBy: { createdAt: 'desc' }
-  });
+  let businesses: any[] = [];
+  try {
+    businesses = await prisma.business.findMany({
+      where: q ? {
+        OR: [
+          { name: { contains: q } },
+          { description: { contains: q } },
+          { services: { some: { name: { contains: q } } } }
+        ]
+      } : undefined,
+      include: {
+        services: true,
+        bookings: { include: { review: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  } catch (err) {
+    console.error('Error fetching businesses in ExplorePage:', err);
+  }
 
   return (
     <div className="min-h-screen bg-brand-background">
@@ -52,9 +57,10 @@ export default async function ExplorePage(props: { searchParams?: Promise<{ [key
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {businesses.map(business => {
-            const avgRating = business.bookings.filter(b => b.review).length 
-              ? (business.bookings.filter(b => b.review).reduce((a, b) => a + b.review!.rating, 0) / business.bookings.filter(b => b.review).length).toFixed(1)
+          {businesses.map((business: any) => {
+            const reviews = business.bookings ? business.bookings.map((b: any) => b.review).filter(Boolean) : [];
+            const avgRating = reviews.length 
+              ? (reviews.reduce((a: number, b: any) => a + (b.rating || 0), 0) / reviews.length).toFixed(1)
               : 'New';
 
             return (
@@ -89,7 +95,7 @@ export default async function ExplorePage(props: { searchParams?: Promise<{ [key
                   
                   <div className="mt-auto">
                     <div className="flex flex-wrap gap-2 mb-6">
-                      {business.services.slice(0, 2).map(service => (
+                      {business.services.slice(0, 2).map((service: any) => (
                         <span key={service.id} className="text-xs font-medium px-3 py-1 bg-brand-primary/5 text-brand-primary rounded-full">
                           {service.name}
                         </span>

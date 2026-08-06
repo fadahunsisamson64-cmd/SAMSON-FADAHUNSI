@@ -408,6 +408,7 @@ export default function BookingPage() {
                       <label className="text-sm font-medium text-brand-dark block mb-1">Full Name *</label>
                       <input 
                         type="text"
+                        autoComplete="name"
                         value={customerDetails.name}
                         onChange={e => setCustomerDetails(d => ({ ...d, name: e.target.value }))}
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary outline-none text-sm"
@@ -421,6 +422,7 @@ export default function BookingPage() {
                         <label className="text-sm font-medium text-brand-dark block mb-1">Email Address *</label>
                         <input 
                           type="email"
+                          autoComplete="email"
                           value={customerDetails.email}
                           onChange={e => setCustomerDetails(d => ({ ...d, email: e.target.value }))}
                           className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary outline-none text-sm"
@@ -432,6 +434,7 @@ export default function BookingPage() {
                         <label className="text-sm font-medium text-brand-dark block mb-1">Phone Number (Optional)</label>
                         <input 
                           type="tel"
+                          autoComplete="tel"
                           value={customerDetails.phone}
                           onChange={e => setCustomerDetails(d => ({ ...d, phone: e.target.value }))}
                           className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary outline-none text-sm"
