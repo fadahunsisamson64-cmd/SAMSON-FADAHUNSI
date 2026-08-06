@@ -1,0 +1,6 @@
+{
+  "name": "Lumina Booking",
+  "description": "Premium SaaS booking platform for local service businesses.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

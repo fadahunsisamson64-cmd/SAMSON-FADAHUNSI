@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  BUSINESS_OWNER
+  STAFF
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+  role      UserRole @default(CUSTOMER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ownedBusinesses Business[] @relation("BusinessOwner")
+  staffProfiles   Staff[]
+  bookings        Booking[]
+  reviews         Review[]
+}
+
+model Business {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  logoUrl     String?
+  bannerUrl   String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner       User      @relation("BusinessOwner", fields: [ownerId], references: [id])
+  services    Service[]
+  staff       Staff[]
+  bookings    Booking[]
+}
+
+model Staff {
+  id         String   @id @default(cuid())
+  userId     String
+  businessId String
+  bio        String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user       User      @relation(fields: [userId], references: [id])
+  business   Business  @relation(fields: [businessId], references: [id])
+  bookings   Booking[]
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  businessId  String
+  name        String
+  description String?
+  price       Float
+  duration    Int      // in minutes
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business Business  @relation(fields: [businessId], references: [id])
+  bookings Booking[]
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  DEPOSIT_PAID
+  PAID
+  REFUNDED
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  customerId    String
+  businessId    String
+  serviceId     String
+  staffId       String?
+  startTime     DateTime
+  endTime       DateTime
+  status        BookingStatus @default(PENDING)
+  paymentStatus PaymentStatus @default(PENDING)
+  totalPrice    Float
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  customer User     @relation(fields: [customerId], references: [id])
+  business Business @relation(fields: [businessId], references: [id])
+  service  Service  @relation(fields: [serviceId], references: [id])
+  staff    Staff?   @relation(fields: [staffId], references: [id])
+  review   Review?
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  bookingId String   @unique
+  authorId  String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+  author  User    @relation(fields: [authorId], references: [id])
+}
