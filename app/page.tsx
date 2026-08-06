@@ -50,19 +50,19 @@ export default function LandingPage() {
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-8 text-sm font-medium text-brand-muted">
+            <Link href="/explore" className="text-brand-primary font-semibold hover:text-brand-accent transition-colors">Explore Services</Link>
+            <Link href="/customer" className="hover:text-brand-primary transition-colors">My Bookings</Link>
             <Link href="#features" className="hover:text-brand-primary transition-colors">Features</Link>
-            <Link href="#solutions" className="hover:text-brand-primary transition-colors">Solutions</Link>
             <Link href="#pricing" className="hover:text-brand-primary transition-colors">Pricing</Link>
-            <Link href="#testimonials" className="hover:text-brand-primary transition-colors">Testimonials</Link>
           </div>
 
           <div className="hidden lg:flex items-center gap-4">
             <Link href="/login" className="text-sm font-medium text-brand-dark hover:text-brand-primary transition-colors">
-              Log in
+              Business Sign In
             </Link>
-            <button className="bg-brand-dark text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-brand-primary transition-all shadow-lg hover:shadow-xl hover:shadow-brand-dark/20 hover:-translate-y-0.5 flex items-center gap-2">
+            <Link href="/register" className="bg-brand-dark text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-brand-primary transition-all shadow-lg hover:shadow-xl hover:shadow-brand-dark/20 hover:-translate-y-0.5 flex items-center gap-2">
               Get Started
-            </button>
+            </Link>
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -80,6 +80,20 @@ export default function LandingPage() {
         {isMenuOpen && (
           <div className="lg:hidden mt-3 max-w-7xl mx-auto glass-panel rounded-3xl p-6 shadow-2xl border border-white/40 animate-in fade-in slide-in-from-top-4 duration-200">
             <div className="flex flex-col gap-4 text-base font-medium text-brand-dark">
+              <Link 
+                href="/explore" 
+                onClick={() => setIsMenuOpen(false)}
+                className="px-4 py-2 hover:bg-white/60 text-brand-primary font-semibold rounded-xl transition-colors"
+              >
+                Explore Services
+              </Link>
+              <Link 
+                href="/customer" 
+                onClick={() => setIsMenuOpen(false)}
+                className="px-4 py-2 hover:bg-white/60 rounded-xl transition-colors"
+              >
+                My Bookings
+              </Link>
               <Link 
                 href="#features" 
                 onClick={() => setIsMenuOpen(false)}

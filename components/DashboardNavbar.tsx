@@ -60,6 +60,18 @@ export default function DashboardNavbar({ title, user, onLogout }: DashboardNavb
         </div>
 
         <div className="flex items-center gap-3 sm:gap-4">
+          <Link 
+            href="/explore" 
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-primary bg-brand-primary/10 hover:bg-brand-primary/20 rounded-lg transition-colors"
+          >
+            Explore Services
+          </Link>
+          <Link 
+            href="/customer" 
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-dark bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            My Bookings
+          </Link>
           <button className="text-brand-muted hover:text-brand-dark p-1.5 hover:bg-gray-50 rounded-lg transition-colors">
             <Bell className="w-5 h-5" />
           </button>

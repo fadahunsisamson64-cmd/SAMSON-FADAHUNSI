@@ -29,9 +29,14 @@ export default async function ExplorePage(props: { searchParams?: Promise<{ [key
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-brand-dark tracking-tight">Lumina</Link>
-          <div className="flex gap-4">
-            <Link href="/login" className="text-brand-muted hover:text-brand-dark font-medium px-4 py-2">Sign In</Link>
+          <Link href="/" className="text-2xl font-bold text-brand-dark tracking-tight flex items-center gap-2">
+            <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-primary to-brand-accent flex items-center justify-center text-white text-sm font-bold">L</span>
+            Lumina
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/customer" className="text-sm text-brand-dark font-medium hover:text-brand-primary px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">My Bookings</Link>
+            <Link href="/dashboard" className="text-sm text-brand-muted hover:text-brand-dark font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">Business Dashboard</Link>
+            <Link href="/login" className="text-sm bg-brand-primary text-white font-medium px-4 py-2 rounded-xl hover:bg-brand-secondary transition-colors">Sign In</Link>
           </div>
         </div>
       </header>
