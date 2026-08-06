@@ -5,13 +5,19 @@ import { revalidatePath } from 'next/cache'
 
 export async function getBusinessForBooking(slug: string) {
   try {
-    const business = await prisma.business.findUnique({
-      where: { slug },
+    const business = await prisma.business.findFirst({
+      where: {
+        OR: [
+          { slug: { equals: slug, mode: 'insensitive' } },
+          { id: slug }
+        ]
+      },
       include: {
         services: true,
         staff: {
           include: { user: true }
-        }
+        },
+        availabilities: true
       }
     });
 
@@ -20,7 +26,7 @@ export async function getBusinessForBooking(slug: string) {
     return { success: true, data: business };
   } catch (error) {
     console.error('Error fetching business:', error);
-    return { success: false, error: 'Failed to fetch business' };
+    return { success: false, error: 'Failed to fetch business details' };
   }
 }
 
@@ -30,12 +36,14 @@ export async function createBooking(data: {
   staffId?: string;
   customerName: string;
   customerEmail: string;
+  customerPhone?: string;
+  paymentMethod?: string;
   startTime: Date;
   endTime: Date;
   price: number;
 }) {
   try {
-// Check for conflicting bookings if a staff member is selected
+    // Check for conflicting bookings if a staff member is selected
     if (data.staffId) {
       const conflictingBooking = await prisma.booking.findFirst({
         where: {
@@ -50,7 +58,7 @@ export async function createBooking(data: {
       });
       
       if (conflictingBooking) {
-        return { success: false, error: 'The selected time slot is no longer available for this staff member.' };
+        return { success: false, error: 'The selected time slot is no longer available for this staff member. Please select another time.' };
       }
     }
     
@@ -64,6 +72,11 @@ export async function createBooking(data: {
           role: 'CUSTOMER'
         }
       });
+    } else if (!user.name && data.customerName) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { name: data.customerName }
+      });
     }
 
     const booking = await prisma.booking.create({
@@ -71,18 +84,26 @@ export async function createBooking(data: {
         customerId: user.id,
         businessId: data.businessId,
         serviceId: data.serviceId,
-        staffId: data.staffId,
+        staffId: data.staffId || null,
         startTime: data.startTime,
         endTime: data.endTime,
         totalPrice: data.price,
         status: 'PENDING',
-        paymentStatus: 'PENDING'
+        paymentStatus: data.paymentMethod === 'ONLINE' ? 'PAID' : 'PENDING'
+      },
+      include: {
+        service: true,
+        business: true,
+        staff: { include: { user: true } }
       }
     });
+
+    revalidatePath('/customer');
+    revalidatePath('/dashboard');
 
     return { success: true, data: booking };
   } catch (error) {
     console.error('Error creating booking:', error);
-    return { success: false, error: 'Failed to create booking' };
+    return { success: false, error: 'Failed to create booking. Please try again.' };
   }
 }
