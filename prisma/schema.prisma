@@ -6,9 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum UserRole {
@@ -40,20 +39,38 @@ model Business {
   description String?
   logoUrl     String?
   bannerUrl   String?
+  category    String?
+  address     String?
+  phone       String?
+  isVerified  Boolean  @default(false)
   ownerId     String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  owner       User      @relation("BusinessOwner", fields: [ownerId], references: [id])
-  services    Service[]
-  staff       Staff[]
-  bookings    Booking[]
+  owner          User           @relation("BusinessOwner", fields: [ownerId], references: [id])
+  services       Service[]
+  staff          Staff[]
+  bookings       Booking[]
+  availabilities Availability[]
+}
+
+model Availability {
+  id         String   @id @default(cuid())
+  businessId String
+  dayOfWeek  Int      // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  startTime  String   @default("09:00")
+  endTime    String   @default("17:00")
+  isOpen     Boolean  @default(true)
+
+  business   Business @relation(fields: [businessId], references: [id])
+  @@unique([businessId, dayOfWeek])
 }
 
 model Staff {
   id         String   @id @default(cuid())
   userId     String
   businessId String
+  role       String?
   bio        String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

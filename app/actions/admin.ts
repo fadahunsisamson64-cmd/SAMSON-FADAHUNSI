@@ -66,7 +66,8 @@ export async function getAdminBusinesses(token?: string) {
         name: b.name,
         owner: b.owner?.name || b.owner?.email || 'Unknown',
         type: 'Business',
-        status: 'Active',
+        status: b.isVerified ? 'Verified' : 'Pending',
+        isVerified: b.isVerified,
         joined: b.createdAt.toLocaleDateString(),
         revenue: '$' + revenue.toFixed(2)
       };
@@ -76,6 +77,23 @@ export async function getAdminBusinesses(token?: string) {
   } catch (error) {
     console.error('Error fetching admin businesses:', error);
     return { success: false, error: 'Failed to fetch businesses' };
+  }
+}
+
+export async function toggleBusinessVerification(token: string | undefined, businessId: string, isVerified: boolean) {
+  try {
+    const admin = await verifyAdmin(token);
+    if (!admin) return { success: false, error: 'Unauthorized' };
+
+    const updated = await prisma.business.update({
+      where: { id: businessId },
+      data: { isVerified }
+    });
+
+    return { success: true, data: updated };
+  } catch (error) {
+    console.error('Error toggling business verification:', error);
+    return { success: false, error: 'Failed to update business verification' };
   }
 }
 

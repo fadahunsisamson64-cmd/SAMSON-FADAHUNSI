@@ -3,34 +3,52 @@ import { getSupabase } from '@/lib/supabase';
 
 
 import { useState, useEffect } from 'react';
-import { Search, Filter, MoreHorizontal, CheckCircle2, XCircle, Clock, Loader2 } from 'lucide-react';
+import { Search, Filter, MoreHorizontal, CheckCircle2, XCircle, Clock, Loader2, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { motion } from 'motion/react';
-import { getAdminBusinesses } from '@/app/actions/admin';
+import { getAdminBusinesses, toggleBusinessVerification } from '@/app/actions/admin';
 
 export default function AdminBusinessesPage() {
   const [activeTab, setActiveTab] = useState('All');
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const loadData = async () => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    const res = await getAdminBusinesses(session.access_token);
+    if (!res.success) { window.location.href = '/dashboard'; return; }
+    if (res.success && res.data) {
+      setBusinesses(res.data);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    async function load() {
+    loadData();
+  }, []);
+
+  const handleToggleVerification = async (id: string, currentStatus: boolean) => {
+    setUpdatingId(id);
+    try {
       const supabase = getSupabase();
       if (!supabase) return;
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        // could redirect or handle error
-        return;
+
+      const res = await toggleBusinessVerification(session?.access_token, id, !currentStatus);
+      if (res.success) {
+        await loadData();
       }
-      const res = await getAdminBusinesses(session.access_token);
-      if (!res.success) { window.location.href = '/dashboard'; return; }
-      if (res.success && res.data) {
-        setBusinesses(res.data);
-      }
-      setLoading(false);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setUpdatingId(null);
     }
-    load();
-  }, []);
+  };
 
   if (loading) {
     return (
@@ -43,7 +61,9 @@ export default function AdminBusinessesPage() {
   const filteredBusinesses = businesses.filter(b => {
     const matchesSearch = b.name.toLowerCase().includes(search.toLowerCase()) || b.owner.toLowerCase().includes(search.toLowerCase());
     if (activeTab === 'All') return matchesSearch;
-    return matchesSearch && b.status === activeTab;
+    if (activeTab === 'Verified' || activeTab === 'Active') return matchesSearch && b.isVerified;
+    if (activeTab === 'Pending') return matchesSearch && !b.isVerified;
+    return matchesSearch;
   });
 
   return (
@@ -134,16 +154,17 @@ export default function AdminBusinessesPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1.5">
-                        {business.status === 'Active' && <CheckCircle2 className="w-4 h-4 text-brand-success" />}
-                        {business.status === 'Pending' && <Clock className="w-4 h-4 text-brand-warning" />}
-                        {business.status === 'Suspended' && <XCircle className="w-4 h-4 text-brand-danger" />}
-                        <span className={`text-sm font-medium ${
-                          business.status === 'Active' ? 'text-brand-success' :
-                          business.status === 'Pending' ? 'text-brand-warning' :
-                          'text-brand-danger'
-                        }`}>
-                          {business.status}
-                        </span>
+                        {business.isVerified ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            <span className="text-sm font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">Verified</span>
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="w-4 h-4 text-amber-500" />
+                            <span className="text-sm font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full">Pending</span>
+                          </>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-brand-muted">
@@ -153,8 +174,16 @@ export default function AdminBusinessesPage() {
                       {business.revenue}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="p-2 text-brand-muted hover:text-brand-dark hover:bg-gray-100 rounded-lg transition-colors">
-                        <MoreHorizontal className="w-5 h-5" />
+                      <button
+                        onClick={() => handleToggleVerification(business.id, business.isVerified)}
+                        disabled={updatingId === business.id}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
+                          business.isVerified
+                            ? 'border border-gray-200 text-gray-600 hover:bg-gray-100'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
+                        }`}
+                      >
+                        {updatingId === business.id ? 'Updating...' : business.isVerified ? 'Revoke Verification' : 'Verify & Approve'}
                       </button>
                     </td>
                   </motion.tr>

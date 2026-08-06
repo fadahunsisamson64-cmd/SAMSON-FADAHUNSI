@@ -33,7 +33,6 @@ export default function DashboardNavbar({ title, user, onLogout }: DashboardNavb
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Calendar', href: '/dashboard/calendar', icon: Calendar },
     { name: 'Customers', href: '/dashboard/customers', icon: Users },
-    { name: 'Admin Portal', href: '/super-admin', icon: ShieldCheck },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
 
