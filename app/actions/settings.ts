@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { verifyServerToken } from '@/lib/auth-server';
 
-export async function getBusinessProfile(token: string) {
+export async function getBusinessProfile(token?: string) {
   try {
     const user = await verifyServerToken(token);
     if (!user) return { success: false, error: 'Unauthorized' };
@@ -21,7 +21,7 @@ export async function getBusinessProfile(token: string) {
   }
 }
 
-export async function updateBusinessProfile(token: string, data: { name: string; description?: string }) {
+export async function updateBusinessProfile(token: string | undefined, data: { name: string; description?: string }) {
   try {
     const user = await verifyServerToken(token);
     if (!user) return { success: false, error: 'Unauthorized' };

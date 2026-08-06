@@ -3,7 +3,7 @@ import { verifyAdmin } from '@/lib/auth-server';
 
 import { prisma } from '@/lib/prisma'
 
-export async function getAdminDashboardData(token: string) {
+export async function getAdminDashboardData(token?: string) {
   try {
     const admin = await verifyAdmin(token);
     if (!admin) return { success: false, error: 'Unauthorized' };
@@ -47,7 +47,7 @@ export async function getAdminDashboardData(token: string) {
   }
 }
 
-export async function getAdminBusinesses(token: string) {
+export async function getAdminBusinesses(token?: string) {
   try {
     const admin = await verifyAdmin(token);
     if (!admin) return { success: false, error: 'Unauthorized' };
@@ -79,7 +79,7 @@ export async function getAdminBusinesses(token: string) {
   }
 }
 
-export async function getAdminUsers(token: string) {
+export async function getAdminUsers(token?: string) {
   try {
     const admin = await verifyAdmin(token);
     if (!admin) return { success: false, error: 'Unauthorized' };

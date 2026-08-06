@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { verifyServerToken } from '@/lib/auth-server';
 
-export async function getDashboardData(token: string) {
+export async function getDashboardData(token?: string) {
   try {
     const user = await verifyServerToken(token);
     if (!user) return { success: false, error: 'Unauthorized' };

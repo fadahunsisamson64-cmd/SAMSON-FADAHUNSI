@@ -3,7 +3,7 @@ import { verifyServerToken } from '@/lib/auth-server';
 
 import { prisma } from '@/lib/prisma'
 
-export async function syncUserAction(token: string) {
+export async function syncUserAction(token?: string) {
   try {
     const supabaseUser = await verifyServerToken(token);
     if (!supabaseUser || !supabaseUser.email) return { success: false, error: 'Unauthorized' };

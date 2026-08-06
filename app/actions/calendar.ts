@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 
 import { verifyServerToken } from '@/lib/auth-server';
 
-export async function getCalendarBookings(token: string) {
+export async function getCalendarBookings(token?: string) {
   try {
     const user = await verifyServerToken(token);
     if (!user) return { success: false, error: 'Unauthorized' };

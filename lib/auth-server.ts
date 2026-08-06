@@ -1,7 +1,8 @@
 import { getSupabase } from './supabase';
 import { prisma } from './prisma';
 
-export async function verifyServerToken(token: string) {
+export async function verifyServerToken(token?: string) {
+  if (!token) return null;
   const supabase = getSupabase();
   if (!supabase) return null;
   const { data: { user }, error } = await supabase.auth.getUser(token);
@@ -11,7 +12,8 @@ export async function verifyServerToken(token: string) {
   return user;
 }
 
-export async function verifyAdmin(token: string) {
+export async function verifyAdmin(token?: string) {
+  if (!token) return null;
   const user = await verifyServerToken(token);
   if (!user) return null;
   
